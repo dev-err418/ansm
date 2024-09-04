@@ -1,9 +1,13 @@
 import json
 import sys
 import ast
+import uuid
 from typing import Dict
 from medee.sparse import create_sparse_embedding
 from medee.utils import remove_parentheses, remove_prefix, remove_extra_dots, remove_bracketed_content
+from medee.qdrant import is_collection_created, create_collection, upload_single
+
+collection_name = "ansm"
 
 # lecture du JSON
 def read_json(file_path: str):
@@ -11,7 +15,19 @@ def read_json(file_path: str):
         return json.load(f)
 
 def vectorize_and_append(to_embed_dense: str, to_embed_sparse: str, content: str):
-    return 0
+    dense_vector = [0 for _ in range(1536)]
+    cols, weights = create_sparse_embedding("gros caca tout dur")
+    sparse_vector = {
+        "indices": cols, "values": weights
+    }
+
+    upload_single(
+        id=str(uuid.uuid4()),
+        collection_name=collection_name,
+        dense_vector=dense_vector,
+        sparse_vector=sparse_vector,
+        payload={}
+    )
 
 def recursive_sub_or_content(sub: str, branch: Dict):
     if sub == "content": # on a un child et du contenu
@@ -36,6 +52,9 @@ def recursive_sub_or_content(sub: str, branch: Dict):
 
 if __name__ == "__main__":
     file_path = "data.json"
+
+    is_collection_created(collection_name)
+
     medicaments = read_json(file_path)
 
     for med in medicaments:
@@ -65,5 +84,3 @@ if __name__ == "__main__":
                     sub=sub,
                     branch=caracteristiques[c]
                 )
-
-    # print(remove_parentheses("Autres informations (cliquer pour afficher)"))

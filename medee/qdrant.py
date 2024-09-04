@@ -9,12 +9,11 @@ def create_collection(collection_name: str):
     client.recreate_collection(
         collection_name=collection_name,
         vectors_config={
-            "dense": models.VectorParams(size=1536, distance=models.Distance.COSINE),
-            "dense_content": models.VectorParams(size=1536, distance=models.Distance.COSINE)
+            "dense": models.VectorParams(size=1536, distance=models.Distance.COSINE)
         },
-        optimizers_config=models.OptimizersConfigDiff(
-            indexing_threshold=0,
-        ),
+        # optimizers_config=models.OptimizersConfigDiff(
+        #     indexing_threshold=0,
+        # ),
         sparse_vectors_config={
             "sparse": models.SparseVectorParams(
                 index=models.SparseIndexParams(
@@ -37,6 +36,20 @@ def enable_indexing_threshold(collection_name: str):
         optimizer_config=models.OptimizersConfigDiff(indexing_threshold=20000),
     )
 
+def upload_single(collection_name, id, payload, dense_vector, sparse_vector):
+    client.upsert(
+        collection_name=collection_name,
+        points=[
+            models.PointStruct(
+            id=id,
+            payload={},
+            vector={
+                "dense": dense_vector,
+                "sparse": sparse_vector
+            })
+        ]
+    )
+
 def upload_batch(collection_name, ids, payloads, dense_vectors, dense_content_vectors, sparse_vectors):
     client.upsert(
         collection_name=collection_name,
@@ -45,7 +58,6 @@ def upload_batch(collection_name, ids, payloads, dense_vectors, dense_content_ve
             payloads=payloads,
             vectors={
                 "dense": dense_vectors,
-                "dense_content": dense_content_vectors,
                 "sparse": sparse_vectors,
             },
         ),
