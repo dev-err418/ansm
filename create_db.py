@@ -28,7 +28,7 @@ def vectorize_and_append(to_embed_dense: str, to_embed_sparse: str, content: str
         dense_vector=dense_vector,
         sparse_vector=sparse_vector,
         payload={
-            content: content
+            "content": content
         }
     )
 
