@@ -42,7 +42,7 @@ def upload_single(collection_name, id, payload, dense_vector, sparse_vector):
         points=[
             models.PointStruct(
             id=id,
-            payload={},
+            payload=payload,
             vector={
                 "dense": dense_vector,
                 "sparse": sparse_vector

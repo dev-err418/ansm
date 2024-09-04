@@ -4,6 +4,7 @@ import ast
 import uuid
 from typing import Dict
 from medee.sparse import create_sparse_embedding
+from medee.dense import create_dense_embedding
 from medee.utils import remove_parentheses, remove_prefix, remove_extra_dots, remove_bracketed_content
 from medee.qdrant import is_collection_created, create_collection, upload_single
 
@@ -15,8 +16,8 @@ def read_json(file_path: str):
         return json.load(f)
 
 def vectorize_and_append(to_embed_dense: str, to_embed_sparse: str, content: str):
-    dense_vector = [0 for _ in range(1536)]
-    cols, weights = create_sparse_embedding("gros caca tout dur")
+    dense_vector = create_dense_embedding(to_embed_dense)
+    cols, weights = create_sparse_embedding(to_embed_sparse)
     sparse_vector = {
         "indices": cols, "values": weights
     }
@@ -26,7 +27,9 @@ def vectorize_and_append(to_embed_dense: str, to_embed_sparse: str, content: str
         collection_name=collection_name,
         dense_vector=dense_vector,
         sparse_vector=sparse_vector,
-        payload={}
+        payload={
+            content: content
+        }
     )
 
 def recursive_sub_or_content(sub: str, branch: Dict):
@@ -38,9 +41,9 @@ def recursive_sub_or_content(sub: str, branch: Dict):
         content = remove_bracketed_content(content)
 
         vectorize_and_append(
-            to_embed_dense="", # la str a dense embed (contenu/titre/path/etc...)
-            to_embed_sparse="", # la str a sparse embed (contenu/titre/path/etc...)
-            content="" # le contenu affiché dans la DB pour se reperer
+            to_embed_dense=sub, # la str a dense embed (contenu/titre/path/etc...)
+            to_embed_sparse=sub, # la str a sparse embed (contenu/titre/path/etc...)
+            content=content # le contenu affiché dans la DB pour se reperer
         )
     elif sub != "": # on a un sous titre
         print(sub)
@@ -69,9 +72,9 @@ if __name__ == "__main__":
             content = infos[i]
 
             vectorize_and_append(
-                to_embed_dense="", # la str a dense embed (contenu/titre/path/etc...)
-                to_embed_sparse="", # la str a sparse embed (contenu/titre/path/etc...)
-                content="" # le contenu affiché dans la DB pour se reperer
+                to_embed_dense=path, # la str a dense embed (contenu/titre/path/etc...)
+                to_embed_sparse=path, # la str a sparse embed (contenu/titre/path/etc...)
+                content=content # le contenu affiché dans la DB pour se reperer
             )
 
         for c in caracteristiques:

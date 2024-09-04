@@ -26,4 +26,6 @@ def create_sparse_embedding(d: str) -> Tuple[List[int], List[float]]:
     cols = vec.nonzero().squeeze().cpu().tolist()
     weights = vec[cols].cpu().tolist()
 
+    words = tokenizer.convert_ids_to_tokens(cols)
+
     return cols, weights
